@@ -70,14 +70,14 @@ class CNN(nn.Module):
         # Define 1st convolutional layer
         # Takes 1 input channel (grayscale images) and outputs 10 feature maps
         # Uses a 5x5 kernel (filter) for convolution
-        self.conv1 == nn.Conv2d(1, 10, kernel_size=5)
+        self.conv1 = nn.Conv2d(1, 10, kernel_size=5)
 
         # Define 2nd convolutional layer
         # Takes 10 input channels (from previous layer) and outputs 20 feature maps        
-        self.conv2 == nn.Conv2d(10, 20, kernel_size=5)
+        self.conv2 = nn.Conv2d(10, 20, kernel_size=5)
 
         # Add a dropout layer to reduce overfitting by randomly zeroing some channels
-        self.conv2_drop == nn.Dropout2d()
+        self.conv2_drop = nn.Dropout2d()
 
         # Define 1st fully connected layer
         # Maps 320 input features (flattened feature maps) to 50 output features
@@ -86,3 +86,30 @@ class CNN(nn.Module):
         # Define 2nd fully connected layer
         # Maps 50 input features to 10 output classes (digits 0-9 for classification)   
         self.fc2 = nn.Linear(50, 10)
+
+    #Define forward pass of the CNN
+    def forward(self, x):
+        
+        # Apply 1st convolutional layer followed by ReLU activation and max pooling
+        # Max pooling reduces spatial dimensions by a factor of 2 (2x2 pooling window)
+        x = F.relu(F.max_pool2d(self.conv1(x), 2))
+        
+        # Apply the 2nd convolutional layer followed by dropout, ReLU activation, and max pooling
+        # Dropout helps prevent overfitting by randomly zeroing some feature maps during training
+        x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
+        
+        # Flatten the feature maps into a 1D vector for input to the fc layers
+        # -1 allows PyTorch to infer batch size automatically
+        x = x.view(-1, 320)
+        
+        # 1st fc layer followed by ReLU activation
+        x = F.relu(self.fc1(x))
+        
+        # Dropout to the output of the 1st fc layer during training
+        x = F.dropout(x, training=self.training)
+        
+        # 2nd fc layer (output layer)
+        x = self.fc2(x)
+        
+        # softmax function to produce probabilities for each class
+        return F.softmax(x, dim=1)
