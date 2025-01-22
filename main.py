@@ -37,3 +37,21 @@ train_data.targets
 ###
 
 
+from torch.utils.data import DataLoader #Import DataLoader to manage batches of data for training and testing
+
+#Create data loaders for training and testing datasets
+loaders = {
+
+    'train': DataLoader(train_data, 
+                        batch_size=100,  #Number of samples per batch
+                        shuffle=True,    #Shuffle the data
+                        num_workers=1),  #Number of worker threads
+
+    'test': DataLoader(test_data,
+                       batch_size=100,
+                       shuffle=True,
+                       num_workers=1),
+}
+
+#Output train and test DataLoader objects
+loaders
