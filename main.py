@@ -87,6 +87,7 @@ class CNN(nn.Module):
         # Maps 50 input features to 10 output classes (digits 0-9 for classification)   
         self.fc2 = nn.Linear(50, 10)
 
+    
     #Define forward pass of the CNN
     def forward(self, x):
         
@@ -113,3 +114,44 @@ class CNN(nn.Module):
         
         # softmax function to produce probabilities for each class
         return F.softmax(x, dim=1)
+    
+
+import torch #Import for tensor computations and model training
+
+# Set device to GPU if available, otherwise default to CPU
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+# Initialize CNN model and move it to selected device (GPU or CPU)
+model = CNN().to(device)
+
+# Define optimizer with model parameters and LR
+optimizer = optim.Adam(model.parameters(), learning_rate=0.001)
+
+# Define the loss function for multi-class classification
+loss_function = nn.CrossEntropyLoss()
+
+
+# train() function to train the model for one epoch
+def train(epoch):
+    
+    # set model to training mode
+    model.train()
+
+    # Loop through training data in batches
+    for batch_index, (data, target) in enumerate(loaders('train')):
+
+        data = data.to(device)                  # Move input data to selected device (GPU or CPU)
+        target = target.to(device)              # Move target labels to the selected device
+
+        optimizer.zero_grad()                   # Clear gradients from previous step
+        output = model(data)                    # Forward pass: compute model predictions
+        loss = loss_function(output, target)    # Calculate loss
+        loss.backward()                         # Backward pass: compute gradients
+        optimizer.step()                        # Update model parameters using gradients
+
+        # For every 20 batches, print the progress (script logs epoch, progress percentage, and current loss to the console)
+        if batch_index % 20 == 0:
+            print(f'Train Epoch: {epoch} [{batch_index * len(data)}/{len(loaders['train'].dataset)} ({100. * batch_index / len(loaders['train']):.0f}%)]\t{loss.item():.6f}')
+
+def test():
+    model.eval()
