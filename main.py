@@ -151,7 +151,47 @@ def train(epoch):
 
         # For every 20 batches, print the progress (script logs epoch, progress percentage, and current loss to the console)
         if batch_index % 20 == 0:
-            print(f'Train Epoch: {epoch} [{batch_index * len(data)}/{len(loaders['train'].dataset)} ({100. * batch_index / len(loaders['train']):.0f}%)]\t{loss.item():.6f}')
+            print(f'Train Epoch: {epoch} [{batch_index * len(data)}/{len(loaders["train"].dataset)} '
+                  f'({100. * batch_index / len(loaders["train"]):.0f}%)]\tLoss: {loss.item():.6f}')
 
+
+# Function to evaluate the model on the test dataset
 def test():
-    model.eval()
+    
+    model.eval()   # Set model to evaluation mode
+
+    test_loss = 0  # Initialize the total test loss
+    correct = 0    # Initialize the count of correctly classified samples
+
+    # Disable gradient calculation
+    with torch.no_grad():
+        
+        # Loop through test data in batches
+        for data, target in loaders['test']:
+            data = data.to(device)      # Move input data to the selected device (GPU or CPU)
+            target = target.to(device)  # Move target labels to the selected device
+            
+            output = model(data)        # Forward pass: compute model predictions
+            
+            # Accumulate test loss
+            test_loss += loss_function(output, target).item()
+            
+            # Get the predicted class by finding the index of the maximum logit (logit maps probabilities to real numbers)
+            prediction = output.argmax(dim=1, keepdim=True)
+            
+            # Count the number of correct predictions
+            correct += prediction.eq(target.view_as(prediction)).sum().item()
+    
+    # Calculate the average test loss
+    test_loss /= len(loaders['test'].dataset)
+    
+    # Print the test set results, including average loss and accuracy
+    print(f'\nTest set: Average loss: {test_loss:.4f}, '
+          f'Accuracy: {correct}/{len(loaders["test"].dataset)} '
+          f'({100. * correct / len(loaders["test"].dataset):.0f}%)\n')
+    
+
+# Loop through 10 epochs for training and testing the model
+for epoch in range(1,11):
+    train(epoch)
+    test()
