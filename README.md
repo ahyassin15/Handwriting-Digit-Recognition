@@ -1,9 +1,9 @@
-Handwritten Digit Recognition with PyTorch
+# Handwritten Digit Recognition with PyTorch
 
 This project implements a Convolutional Neural Network (CNN) using PyTorch to classify handwritten digits from the MNIST dataset. The model is trained on grayscale images of digits (0-9) and achieves predictions using a softmax output layer.
 
 
-Features:
+# Features:
 
 1. Dataset Handling:
 - Utilizes the MNIST dataset with torchvision.
@@ -25,6 +25,6 @@ Features:
 - Visualizes individual test samples and their corresponding predictions using Matplotlib.
 
 
-Results:
+# Results:
 - The model achieves over 95% accuracy on the test dataset after training for 10 epochs.
 - Visualization allows checking predictions for individual test samples.
