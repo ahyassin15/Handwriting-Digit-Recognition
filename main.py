@@ -177,10 +177,10 @@ def test():
             test_loss += loss_function(output, target).item()
             
             # Get the predicted class by finding the index of the maximum logit (logit maps probabilities to real numbers)
-            prediction = output.argmax(dim=1, keepdim=True)
+            predict = output.argmax(dim=1, keepdim=True)
             
             # Count the number of correct predictions
-            correct += prediction.eq(target.view_as(prediction)).sum().item()
+            correct += predict.eq(target.view_as(predict)).sum().item()
     
     # Calculate the average test loss
     test_loss /= len(loaders['test'].dataset)
@@ -195,3 +195,34 @@ def test():
 for epoch in range(1,11):
     train(epoch)
     test()
+
+# Test device type
+device
+    
+import matplotlib.pyplot as pyplot  #Import matplotlib for plotting and data visualization
+
+# Set model to evaluation mode
+model.eval()
+
+# Retrieve a single test data sample (image and target label)
+data, target = test_data[0] #Index can be replaced with other numbers to test different samples
+
+# Add a batch dimension to the data tensor and move it to selected device (GPU or CPU)
+data = data.unsqueeze(0).to(device)
+
+# Perform a forward pass to get the model's prediction
+output = model(data)
+
+# Extract the predicted class from the output
+prediction = output.argmax(dim=1, keepdim=True).item()
+
+# Print the predicted class
+print(f'Prediction: {prediction}')
+
+# Prepare the image for visualization
+# Remove the batch and channel dimensions, move the tensor to the CPU, and convert it to a NumPy array
+image = data.squeeze(0).squeeze(0).cpu().numpy()
+
+# Display the image
+plt.imshow(image, cmap='gray')
+plt.show()
